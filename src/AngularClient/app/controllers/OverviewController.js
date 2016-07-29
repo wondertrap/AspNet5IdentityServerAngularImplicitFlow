@@ -24,7 +24,7 @@
 
 		$log.info(dataEventRecords);
 		$scope.dataEventRecords = dataEventRecords;
-	
+
 		$scope.Delete = function (id) {
 		    $log.info("deleting");
 		    $scope.DataEventRecordsService.DeleteDataEventRecord(id).then(

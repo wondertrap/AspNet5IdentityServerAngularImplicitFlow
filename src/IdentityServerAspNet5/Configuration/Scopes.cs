@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using IdentityServer3.Core.Models;
+using IdentityServer4.Models;
 
-namespace IdentityServerAspNet5
+namespace Host.Configuration
 {
     public class Scopes
     {
@@ -19,12 +19,44 @@ namespace IdentityServerAspNet5
                 new Scope
                 {
                     Name = "dataEventRecords",
-                    DisplayName = "Data Event Records Scope",
+                    DisplayName = "Scope for the data event records resource.",
+                    Type = ScopeType.Resource,
+                    ScopeSecrets = new List<Secret>
+                    {
+                        new Secret("dataEventRecordsSecret".Sha256())
+                    },
+                    Claims = new List<ScopeClaim>
+                    {
+                        new ScopeClaim("role"),
+                        new ScopeClaim("dataEventRecords")
+                    }
+                },
+                new Scope
+                {
+                    Name = "aReallyCoolScope",
+                    DisplayName = "A really cool scope",
                     Type = ScopeType.Resource,
 
                     Claims = new List<ScopeClaim>
                     {
-                        new ScopeClaim("role")
+                        new ScopeClaim("role"),
+                        new ScopeClaim("aReallyCoolScope")
+                    }
+                },
+                new Scope
+                {
+                    Name = "securedFiles",
+                    DisplayName = "Scope for the secured files resource.",
+                    Type = ScopeType.Resource,
+
+                    ScopeSecrets = new List<Secret>
+                    {
+                        new Secret("securedFilesSecret".Sha256())
+                    },
+                    Claims = new List<ScopeClaim>
+                    {
+                        new ScopeClaim("role"),
+                        new ScopeClaim("securedFiles")
                     }
                 }
             };

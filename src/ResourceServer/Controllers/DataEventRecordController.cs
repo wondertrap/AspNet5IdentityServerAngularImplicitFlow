@@ -1,13 +1,11 @@
+using AspNet5SQLite.Model;
+using AspNet5SQLite.Repositories;
+
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
 namespace AspNet5SQLite.Controllers
 {
-    using System.Collections.Generic;
-
-    using AspNet5SQLite.Model;
-    using AspNet5SQLite.Repositories;
-
-    using Microsoft.AspNet.Authorization;
-    using Microsoft.AspNet.Mvc;
-
     [Authorize]
     [Route("api/[controller]")]
     public class DataEventRecordsController : Controller
@@ -19,30 +17,35 @@ namespace AspNet5SQLite.Controllers
             _dataEventRecordRepository = dataEventRecordRepository;
         }
 
+        [Authorize("dataEventRecordsUser")]
         [HttpGet]
-        public IEnumerable<DataEventRecord> Get()
+        public IActionResult Get()
         {
-            return _dataEventRecordRepository.GetAll();
+            return Ok(_dataEventRecordRepository.GetAll());
         }
 
+        [Authorize("dataEventRecordsAdmin")]
         [HttpGet("{id}")]
-        public DataEventRecord Get(long id)
+        public IActionResult Get(long id)
         {
-            return _dataEventRecordRepository.Get(id);
+            return Ok(_dataEventRecordRepository.Get(id));
         }
 
+        [Authorize("dataEventRecordsAdmin")]
         [HttpPost]
         public void Post([FromBody]DataEventRecord value)
         {
             _dataEventRecordRepository.Post(value);
         }
 
+        [Authorize("dataEventRecordsAdmin")]
         [HttpPut("{id}")]
         public void Put(long id, [FromBody]DataEventRecord value)
         {
             _dataEventRecordRepository.Put(id, value);
         }
 
+        [Authorize("dataEventRecordsAdmin")]
         [HttpDelete("{id}")]
         public void Delete(long id)
         {

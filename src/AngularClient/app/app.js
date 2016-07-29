@@ -3,79 +3,70 @@
 
     mainApp.config(["$stateProvider", "$urlRouterProvider", "$locationProvider",
     function ($stateProvider, $urlRouterProvider, $locationProvider) {
-        $urlRouterProvider.otherwise("/authorized");
+        $urlRouterProvider.otherwise("/unauthorized");
 
         $stateProvider
             .state("authorized", {
                 url: "/authorized",
                 templateUrl: "/templates/authorized.html",
-                controller: "AuthorizedController"
+                controller: "AuthorizeController"
             })
-		        .state("home", { abstract: true, url: "/home", templateUrl: "/templates/home.html" })
-                  
-		        .state("overview", {
-		            abstract: true,
-		            parent: "home",
-		            url: "/overview",
-		            templateUrl: "/templates/overview.html"
-		        })
-		        .state("details", {
-		            parent: "overview",
-		            url: "/details/:id",
-		            templateUrl: "/templates/details.html",
-		            controller: "DetailsController",
-		            resolve: {
-		                DataEventRecordsService: "DataEventRecordsService",
-
-		                dataEventRecords: [
-		                    "DataEventRecordsService", function(DataEventRecordsService) {
-		                        return DataEventRecordsService.GetDataEventRecords();
-		                    }
-		                ],
-		                dataEventRecord: [
-		                    "DataEventRecordsService", "$stateParams", function(DataEventRecordsService, $stateParams) {
-		                        var id = $stateParams.id;
-		                        console.log($stateParams.id);
-		                        return DataEventRecordsService.GetDataEventRecord({ id: id });
-		                    }
-		                ]
+            .state("forbidden", { url: "/forbidden", templateUrl: "/templates/forbidden.html" })
+            .state("unauthorized", { url: "/unauthorized", templateUrl: "/templates/unauthorized.html" })
+            .state("logoff", { url: "/logoff", templateUrl: "/templates/unauthorized.html", controller: "LogoffController" })
+        
+		    .state("details", {
+		        url: "/details/:id",
+		        templateUrl: "/templates/details.html",
+		        controller: "DetailsController",
+		        resolve: {
+		            DataEventRecordsService: "DataEventRecordsService",
+		            dataEventRecord: [
+		                "DataEventRecordsService", "$stateParams", function (DataEventRecordsService, $stateParams) {
+		                    var id = $stateParams.id;
+		                    console.log($stateParams.id);
+		                    return DataEventRecordsService.GetDataEventRecord({ id: id });
+		                }
+		            ]
+		        }
+		    })
+            .state("overviewindex", {
+                url: "/overviewindex",
+                templateUrl: "/templates/overviewindex.html",
+                controller: "OverviewController",
+                resolve: {
+                    DataEventRecordsService: "DataEventRecordsService",
+                    dataEventRecords: [
+		                "DataEventRecordsService", function (DataEventRecordsService) {
+		                    return DataEventRecordsService.GetDataEventRecords();
+		                }
+                    ]
+                }
+            })
+		    .state("create", {
+		        url: "/create",
+		        templateUrl: "/templates/create.html",
+		        controller: "DetailsController",
+		        resolve: {		     
+		            dataEventRecord: [
+		                function () {
+		                    return { Id: "", Name: "", Description: "", Timestamp: "2016-02-15T08:57:32" };
+		                }
+		            ]
+		        }
+		    })
+            .state("reload", {
+		        url: "/reload/:destinationState",
+		        controller: ["$state", "$stateParams", function ($state, $stateParams) {
+		            if ($stateParams.destinationState) {
+		                $state.go($stateParams.destinationState);
 		            }
-		        })
-                .state("overviewindex", {
-                    parent: "overview",
-                    url: "/overviewindex",
-                    templateUrl: "/templates/overviewindex.html",
-                    controller: "OverviewController",
-                    resolve: {
-                        DataEventRecordsService: "DataEventRecordsService",
-
-                        dataEventRecords: [
-		                    "DataEventRecordsService", function(DataEventRecordsService) {
-		                        return DataEventRecordsService.GetDataEventRecords();
-		                    }
-                        ]
-                    }
-                })
-		        .state("create", {
-		            parent: "overview",
-		            url: "/create",
-		            templateUrl: "/templates/create.html",
-		            controller: "DetailsController",
-		            resolve: {
-		                dataEventRecords: [
-		                    "DataEventRecordsService", function(DataEventRecordsService) {
-		                        return DataEventRecordsService.GetDataEventRecords();
-		                    }
-		                ],
-		                dataEventRecord: [
-		                    function() {
-		                        return { Id: "", Name: "", Description: "", Timestamp: "2015-08-28T09:57:32.4669632" };
-		                    }
-		                ]
-
+		            else {
+		                $state.go("overviewindex");
 		            }
-		        });
-
+		        }]
+		    });
+          
 		    $locationProvider.html5Mode(true);
 		}
     ]

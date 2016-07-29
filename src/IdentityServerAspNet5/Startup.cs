@@ -1,40 +1,69 @@
-﻿using Microsoft.AspNet.Builder;
-using Microsoft.Framework.DependencyInjection;
+﻿using Host.Configuration;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using IdentityServer3.Core.Configuration;
-using Microsoft.Dnx.Runtime;
 
-namespace IdentityServerAspNet5
+namespace Host
 {
     public class Startup
     {
-        public void ConfigureServices(IServiceCollection services)
+        private readonly IHostingEnvironment _environment;
+
+        public Startup(IHostingEnvironment env)
         {
-            services.AddDataProtection();
+            _environment = env;
         }
 
-        public void Configure(IApplicationBuilder app, IApplicationEnvironment env)
+        public void ConfigureServices(IServiceCollection services)
         {
-            app.UseIISPlatformHandler();
+            var cert = new X509Certificate2(Path.Combine(_environment.ContentRootPath, "damienbodserver.pfx"), "");
+
+            var builder = services.AddIdentityServer()
+                .SetSigningCredential(cert)
+                .AddInMemoryClients(Clients.Get())
+                .AddInMemoryScopes(Scopes.Get())
+                .AddInMemoryUsers(Users.Get());
+
+            // for the UI
+            services
+                .AddMvc()
+                .AddRazorOptions(razor =>
+                {
+                    razor.ViewLocationExpanders.Add(new UI.CustomViewLocationExpander());
+                });
+            services.AddTransient<UI.Login.LoginService>();
+        }
+
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(LogLevel.Trace);
+            loggerFactory.AddDebug(LogLevel.Trace);
+
             app.UseDeveloperExceptionPage();
 
-            var certFile = env.ApplicationBasePath + "\\damienbodserver.pfx";
-
-            var idsrvOptions = new IdentityServerOptions
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
-                Factory = new IdentityServerServiceFactory()
-                                .UseInMemoryUsers(Users.Get())
-                                .UseInMemoryClients(Clients.Get())
-                                .UseInMemoryScopes(Scopes.Get()),
+                AuthenticationScheme = "Temp",
+                AutomaticAuthenticate = false,
+                AutomaticChallenge = false
+            });
 
-                SigningCertificate = new X509Certificate2(certFile, ""),
-                AuthenticationOptions = new AuthenticationOptions
-                {
-                    EnablePostSignOutAutoRedirect = true
-                }
-            };
+            app.UseGoogleAuthentication(new GoogleOptions
+            {
+                AuthenticationScheme = "Google",
+                SignInScheme = "Temp",
+                ClientId = "434483408261-55tc8n0cs4ff1fe21ea8df2o443v2iuc.apps.googleusercontent.com",
+                ClientSecret = "3gcoTrEDPPJ0ukn_aYYT6PWo"
+            });
 
-            app.UseIdentityServer(idsrvOptions);
+            app.UseIdentityServer();
+
+            app.UseStaticFiles();
+            app.UseMvcWithDefaultRoute();
         }
     }
 }

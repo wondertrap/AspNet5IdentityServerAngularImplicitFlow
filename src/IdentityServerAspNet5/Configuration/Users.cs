@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
-using IdentityServer3.Core;
-using IdentityServer3.Core.Services.InMemory;
+using IdentityModel;
+using IdentityServer4.Services.InMemory;
 
-namespace IdentityServerAspNet5
+namespace Host.Configuration
 {
     static class Users
     {
@@ -14,11 +14,42 @@ namespace IdentityServerAspNet5
                 new InMemoryUser{Subject = "48421156", Username = "damienbod", Password = "damienbod",
                     Claims = new Claim[]
                     {
-                        new Claim(Constants.ClaimTypes.Name, "damienbod"),
-                        new Claim(Constants.ClaimTypes.GivenName, "damienbod"),
-                        new Claim(Constants.ClaimTypes.Email, "damien_bod@hotmail.com"),
-                        new Claim(Constants.ClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
-                        new Claim(Constants.ClaimTypes.Role, "Developer")
+                        new Claim(JwtClaimTypes.Name, "damienbod"),
+                        new Claim(JwtClaimTypes.GivenName, "damienbod"),
+                        new Claim(JwtClaimTypes.Email, "damien_bod@hotmail.com"),
+                        new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
+                        new Claim(JwtClaimTypes.Role, "guest"),
+                        new Claim(JwtClaimTypes.Role, "dataEventRecords")
+                    }
+                },
+                new InMemoryUser{Subject = "48421157", Username = "damienbodadmin", Password = "damienbod",
+                    Claims = new Claim[]
+                    {
+                        new Claim(JwtClaimTypes.Name, "damienbodadmin"),
+                        new Claim(JwtClaimTypes.GivenName, "damienbodadmin"),
+                        new Claim(JwtClaimTypes.Email, "damien_bod@hotmail.com"),
+                        new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
+                        new Claim(JwtClaimTypes.Role, "admin"),
+                        new Claim(JwtClaimTypes.Role, "dataEventRecords.admin"),
+                        new Claim(JwtClaimTypes.Role, "dataEventRecords.user"),
+                        new Claim(JwtClaimTypes.Role, "dataEventRecords"),
+                        new Claim(JwtClaimTypes.Role, "securedFiles.user"),
+                        new Claim(JwtClaimTypes.Role, "securedFiles.admin"),
+                        new Claim(JwtClaimTypes.Role, "securedFiles")
+                    }
+                },
+                new InMemoryUser{Subject = "48421158", Username = "damienboduser", Password = "damienbod",
+                    Claims = new Claim[]
+                    {
+                        new Claim(JwtClaimTypes.Name, "damienboduser"),
+                        new Claim(JwtClaimTypes.GivenName, "damienboduser"),
+                        new Claim(JwtClaimTypes.Email, "damien_bod@hotmail.com"),
+                        new Claim(JwtClaimTypes.EmailVerified, "true", ClaimValueTypes.Boolean),
+                        new Claim(JwtClaimTypes.Role, "user"),
+                        new Claim(JwtClaimTypes.Role, "dataEventRecords.user"),
+                        new Claim(JwtClaimTypes.Role, "dataEventRecords"),
+                        new Claim(JwtClaimTypes.Role, "securedFiles.user"),
+                        new Claim(JwtClaimTypes.Role, "securedFiles")
                     }
                 }
             };
